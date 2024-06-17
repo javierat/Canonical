@@ -1,0 +1,121 @@
+# Canonical Technical Assesment
+# Candidate: Javier Torres
+# Email: javier_alejandro_torres_r@hotmail.com
+# Date: 06/17/2024
+
++-------------------+------------------------------------------------------------- +
+| Test Case ID      | TC001                                                        |
++-------------------+------------------------------------------------------------- +
+| Title             | Testing throughput on a 200Gb/s Ethernet device              |
++-------------------+------------------------------------------------------------- +
+| Description       | This test case plans to exercise the throughput of a 200Gb/s |
+|		    | Ethernet device, here are the following scenarios to verify  |
+|		    | that the functionalities are fulfilled.                      |
+|                   |                                                              |
+|		    |  1. Physical Loopback                                        |
+|                   |  2. Parallel System to System Benchmark                      |
+|                   |  3. SRIOV Network Stability                                  |
++-------------------+------------------------------------------------------------- +
+| Tools Used        | iperf3, QEMU-KVM and stress-ng                               |
++-------------------+------------------------------------------------------------- +
+| Prerequisites     | - Condition                                                  |
+|                   | - Condition 2                                                |
++-------------------+--------------------------------------------------------------+
+| Test Steps        |                                                              |
+|		    |	====="General Steps"=====                                  |
+|                   |                                                              |
+|		    |	Step 1: Verify that the client system contains network     |
+|		    |	        cards. (Checking the ports and the capacity).      |
+|		    |	                                                           |
+|                   |        Command: lshw -C network -short                       |
+|                   |                                                              |
+|                   |        Expected Result:                                      |
+|                   |           - System ports detected and connected via QSFP     |
+|		    |	                                                           |
+|		    |	====="Physical Loopback"=====	  			   |
+|                   |	                                          		   |		                               
+|                   |   Step 2: Execute iperf3 as server listener in terminal 1    |                                           
+|                   |                                                              |
+|                   |        Command: iperf3 -s                                    |
+|		    |	                                                           |          
+|                   |   Step 3: Execute iperf3 on terminal 2  as a client mode     |
+|		    |	        for 30 seconds                                     |
+|                   |                                                              |
+|                   |        Command: iperf3 -c localhost -t 30                    |
+|                   |        Expected Result:                                      |
+|		    |		- Multiple iterations where packets are sent and   |
+|		    |		  have a bit rate similar to that expected for     |
+|		    |		  each port                                        |
+|		    |		                                                   |
+|		    |	====="Parallel System to system benchmark"=====            |                                                               
+|                   |                                                              |
+|                   |   Step 2: Execute iperf3 as server listener in system 1      |                                         
+|                   |                                                              |
+|                   |        Command: iperf3 -s                                    |
+|                   |                                                              |             
+|                   |   Step 3: Execute iperf3 in system 2 as a client mode        |
+|		    |	        with 10 parallel streams for 30 secs               |            
+|                   |                                                              |
+|                   |        Command: iperf3 -c <client_ip> -P 10 -t 30            |
+|                   |                                                              |
+|                   |        Expected Result:                                      |
+|                   |             - Multiple iterations where packets are sent and |
+|                   |               have a bit rate similar to that expected for   |
+|                   |               each port                                      |
+| 		    |								   |
+|                   |   ====="SRIOV Network Stability"=====                        |
+|                   |                                                              |
+|                   |   Step 2:check iommu options and have virtualization         |
+|		    |	       technology enabled in BIOS depending on vendor      |
+|                   |                                                              |
+|                   |   Step 3: virtualize via QEMU-KVM with ubuntu ;) by          |
+|		    |		   adding Virtual functions and bind network       |
+|		    |	           cards.                                          |
+|                   |                                                              |
+|                   |           Expected Result:                                   |
+|		    |		  - Creation of the VM inside the system           |
+|                   |                                                              |
+|                   |   Step 4: run stress-ng to generate a stress on the          |
+|		    |		   virtual machine for 2 min. (max. number of      |
+|		    |		   cores for VM)                                   |
+|		    |	      Command: stress-ng --dccp <number of workers>        |
+|                   |                                                              |
+|                   |         Expected Result:                                     |
+|		    |		  - System operating at the maximum level          |
+|                   |			                                           |
+|                   |    Step 5: Execute iperf3 on the system as listener          |
+|                   |           Command: iperf3 -s                                 |
+|                   |                                                              |
+|		    |	 Step 6: Execute iperf3 in VM as a client mode             |
+|                   |           with 10 parallel streams for 2min                  |
+|                   |                                                              |
+|		    |	      Command: iperf3 -c <VM_ip> -P 10 -t 30               |
+|		    |	      Expected Result:                                     |
+|                   |             - Multiple iterations where packets are sent and |
+|                   |               have a bit rate similar to that expected for   |
+|                   |               each port.                                     |
++-------------------+--------------------------------------------------------------+
+| Postconditions    | - Make sure the iperf tool has terminated, if not, destroy   |
+|		    |	the process                                                |
+|		    | - Destroying the virtual machine instances                   |
+|		    | - Verify that the cards are still detected                   |
+|		    | - Make sure that there is a network in the SUT (system under |
+|                   |	test)                                                      |                  
++-------------------+--------------------------------------------------------------+
+| Test Data         | - Time Interval                                              |
+|		    | - Package Transfer average rate                              |
+|		    | - Bitrate average rate                                       |
++-------------------+--------------------------------------------------------------+
+| Test Summary      | - Tests exercised ethernet cards properly by means of iperf  |
+| Criteria          | - The bitrate that appeared in the results is close to the   |
+|		    |	throughput that each port can support.                     |
+|		    | - It is possible to assign and exercise virtual functions to |
+|		    |	the VM through SRIOV and link to network cards where they  |
+|		    |	ensure stability for the VM.                               |
++-------------------+--------------------------------------------------------------+
+| Status            | Pass/Fail                                                    |
++-------------------+--------------------------------------------------------------+
+| Comments          | Observations or comments                                     |
++-------------------+--------------------------------------------------------------+
+| Rev. 1.0          | 06 / 17 /2024                                                |
++-------------------+--------------------------------------------------------------+
